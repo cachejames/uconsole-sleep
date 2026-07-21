@@ -35,14 +35,8 @@ def find_drm_panel():
 
     for panel in os.listdir(DRM_PATH):
         panel_path = os.path.join(DRM_PATH, panel)
-        connector_id_path = os.path.join(panel_path, "connector_id")
-
-        if os.path.isfile(connector_id_path):
-            with open(connector_id_path, "r") as f:
-                connector_id = f.read().strip()
-
-            if connector_id == "48":
-                return panel_path
+        if "DSI" in panel:
+            return panel_path
 
     return ""
 
