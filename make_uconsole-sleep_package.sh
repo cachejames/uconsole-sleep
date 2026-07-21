@@ -1,11 +1,16 @@
 #!/bin/bash
+PACKAGE_VERSION="1.3.$(git rev-list --count HEAD)+$(git rev-parse --short HEAD)"
+echo -e "*** CREATING PACKAGE: \033[1;33mV${PACKAGE_VERSION}\033[0m ***\n"
 
+echo -n "CREATING FOLDERS...";
 mkdir -p uconsole-sleep/DEBIAN
 mkdir -p uconsole-sleep/usr/local/bin
 mkdir -p uconsole-sleep/usr/local/src/uconsole-sleep
 mkdir -p uconsole-sleep/etc/uconsole-sleep
 mkdir -p uconsole-sleep/etc/systemd/system
+echo -e "\033[1;32mOK\033[0m"
 
+echo -n "CREATING FILES...";
 cat << 'EOF' > uconsole-sleep/usr/local/src/uconsole-sleep/README
 Requirement: python3-full, venv(pip)
 1. Edit make.sh
@@ -418,7 +423,7 @@ EOF
 
 cat << 'EOF' > uconsole-sleep/DEBIAN/control
 Package: uconsole-sleep
-Version: ENV_VERSION
+Version: PACKAGE_VERSION
 Maintainer: paragonnov (github.com/qkdxorjs1002)
 Original-Maintainer: paragonnov (github.com/qkdxorjs1002)
 Architecture: all
@@ -427,7 +432,7 @@ Description: uConsole Sleep control scripts.
  Source-Site: https://github.com/qkdxorjs1002/uConsole-sleep
 EOF
 
-sed -i "s|ENV_VERSION|$ENV_VERSION|g" uconsole-sleep/DEBIAN/control
+sed -i "s|PACKAGE_VERSION|$PACKAGE_VERSION|g" uconsole-sleep/DEBIAN/control
 
 cat << 'EOF' > uconsole-sleep/DEBIAN/postinst
 #!/bin/bash
@@ -458,8 +463,9 @@ cat << 'EOF' > uconsole-sleep/DEBIAN/postrm
 
 systemctl daemon-reload
 EOF
+echo -e "\033[1;32mOK\033[0m"
 
-
+echo -e "\n*** RUNNING PYTHON SCRIPTS ***\n"
 cd uconsole-sleep
 python3 -m venv .venv
 source .venv/bin/activate
@@ -475,6 +481,7 @@ python3 -m pip install --no-cache-dir "python-uinput>=1.0.0"
 pyinstaller -F --distpath usr/local/bin/ usr/local/src/uconsole-sleep/sleep_power_control.py
 pyinstaller -F --hidden-import=_libsuinput --distpath usr/local/bin/ usr/local/src/uconsole-sleep/sleep_remap_powerkey.py
 
+echo -n "SETTING PERMISSIONS & REMOVING GENERATED FILES..."
 chmod +x etc/uconsole-sleep/*
 chmod +x usr/local/bin/*
 chmod +x DEBIAN/*
@@ -484,8 +491,9 @@ rm -rf ./*.spec
 rm -rf ./build
 rm -rf ./.venv
 cd ..
+echo -e "\033[1;32mOK\033[0m"
 
+echo -e "\n*** CREATING .DEB FILE ***\n"
 dpkg-deb --build uconsole-sleep
-
 
 rm -rf uconsole-sleep
