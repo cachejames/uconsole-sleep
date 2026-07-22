@@ -1,5 +1,5 @@
 #!/bin/bash
-PACKAGE_VERSION="1.3.$(git rev-list --count HEAD)+$(git rev-parse --short HEAD)"
+PACKAGE_VERSION="2.1.$(git rev-list --count HEAD)+$(git rev-parse --short HEAD)"
 echo -e "*** CREATING PACKAGE: \033[1;33mV${PACKAGE_VERSION}\033[0m ***\n"
 
 echo -n "CREATING FOLDERS...";
